@@ -1,5 +1,6 @@
 {
   "project_name": "new_md_poroject",
   "author": "Anonymous",
-  "create_venv": true
+  "create_venv": true,
+  "run_git_init": true
 }

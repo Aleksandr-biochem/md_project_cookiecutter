@@ -4,15 +4,17 @@ A cookiecutter template to quick start and organise new Molecular Dynamics or ge
 
 Read more [about cookiecutters](https://cookiecutter.readthedocs.io/en/stable/README.html).
 
+**This cookiecutter is under development, watch for updates**
+
 -------------
 
 ## What does this template do?
 
 - Creates a directory structure (e.g. `data`, `plots`, `scripts`, `simulations` etc.)
 
-- Creates a new Python environment for the project with requested libraries.
+- Runs `venv` to create a new Python environment for the project with requested libraries.
 
-- `git init` a new repository in the project directory.
+-`git init` a new repository in the project directory.
 
 
 ## Use this template by fetching from GitHub
@@ -21,6 +23,7 @@ Read more [about cookiecutters](https://cookiecutter.readthedocs.io/en/stable/RE
 cookiecutter gh:Aleksandr-biochem/md_project_cookiecutter
 ```
 
+This will promt you to choose project name, sign your authorship, and whether to create new environment and init a git repository. 
 
 ## Customise for your needs
 
@@ -35,11 +38,11 @@ git clone git@github.com:Aleksandr-biochem/md_project_cookiecutter.git
 cd md_project_cookiecutter
 ```
 
-- **Edit folders structure and files** in `{{ cookiecutter.project_name }}`. You can create any new folders and add any files that you want in your template. **Note:** it is recommended to place empty `__placeholder_file__` in empty folders so that they can be tracked with `git`. Placeholders are cleaned up by post-generation hooks.
+**Edit folders structure and files** in `{{ cookiecutter.project_name }}`. You can create any new folders and add any files that you want in your template. **Note:** it is recommended to place empty `__placeholder_file__` in empty folders so that they can be tracked with `git`. Placeholders are cleaned up by post-generation hooks.
 
-- **Reconfigure venv creation**. 
+**Advanced customisation with hooks:** a lot of steps can be run as [pre- or post-generation hooks](https://cookiecutter.readthedocs.io/en/stable/advanced/hooks.html). You can implement new hooks in `post_gen_ptoject.py` as functions with signatures `Callable[[None], int]` *(additional instructions incoming)*.
 
-- Run your customised cookicutter:
+Run your customised cookicutter:
 
 ```
 # from local clone

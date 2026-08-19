@@ -29,9 +29,6 @@ class PostGenHook:
     def run(self) -> None:
         """Run the hook and record the return code.
         Raise if non-integer return code"""
-        hook_name = self.hook.__name__
-        print(f"{hook_name}{'.' * (50 - len(hook_name))}", end='', flush=True)
-
         return_code = self.hook()
         if not isinstance(return_code, int):
             raise ValueError(
@@ -40,8 +37,9 @@ class PostGenHook:
         
         # log hook execution
         # TODO improve logic of handling raised exceptions and reporitng them
+        hook_name = self.hook.__name__
         passed = f'{bcolors.OKGREEN}PASSED{bcolors.ENDC}' if return_code == 0 else f'{bcolors.FAIL}FAILED{bcolors.ENDC}'
-        print(passed)
+        print(f"{hook_name}{'.' * (50 - len(hook_name))}{passed}")
         
         self.return_code = return_code
         return 
@@ -71,6 +69,14 @@ def create_venv() -> int:
     return return_code
 
 
+def git_init() -> int:
+    """Run git init to initiate a new repository
+    TODO This hook should be upgraded to parametrise repository generation
+    - rename branch
+    - add all files and do an initial commit"""
+    return os.system("git init")
+    
+
 class PostGenProtocol:
     """Protocol for post-generation hooks.
     
@@ -90,6 +96,9 @@ class PostGenProtocol:
         # optional steps
         if '{% if cookiecutter.create_venv %}YES{% endif %}' == 'YES':
             list_of_hooks.append(PostGenHook(create_venv))
+
+        if '{% if cookiecutter.run_git_init %}YES{% endif %}' == 'YES':
+            list_of_hooks.append(PostGenHook(git_init))
 
         return list_of_hooks
     
