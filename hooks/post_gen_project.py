@@ -6,6 +6,7 @@
 """
 
 import os
+import venv
 from glob import glob
 
 from typing import Callable
@@ -18,7 +19,8 @@ class bcolors:
 
 
 class PostGenHook:
-    """Protocol for the post-generation hook from a Callable[[None], int]"""
+    """Protocol for the post-generation hook from a Callable[[None], int]
+    TODO can be a general hook logicboth for pre- and post-gen"""
 
     def __init__(self, hook: Callable[[None], int]):
         self.hook = hook
@@ -27,6 +29,9 @@ class PostGenHook:
     def run(self) -> None:
         """Run the hook and record the return code.
         Raise if non-integer return code"""
+        hook_name = self.hook.__name__
+        print(f"{hook_name}{'.' * (50 - len(hook_name))}", end='', flush=True)
+
         return_code = self.hook()
         if not isinstance(return_code, int):
             raise ValueError(
@@ -34,9 +39,9 @@ class PostGenHook:
             )
         
         # log hook execution
+        # TODO improve logic of handling raised exceptions and reporitng them
         passed = f'{bcolors.OKGREEN}PASSED{bcolors.ENDC}' if return_code == 0 else f'{bcolors.FAIL}FAILED{bcolors.ENDC}'
-        hook_name = self.hook.__name__
-        print(f"{hook_name}{'.' * (50 - len(hook_name))}{passed}")
+        print(passed)
         
         self.return_code = return_code
         return 
@@ -54,6 +59,18 @@ def cleaunup_files() -> int:
     return 0 if len(glob('./**/__placeholder_file__', recursive=True)) == 0 else 1
 
 
+def create_venv() -> int:
+    """Create new virtual environment with venv
+    TODO Allow picking up requirements from requirements.txt"""
+    venv_dir = os.path.join(os.path.expanduser("~"), "venv")
+    return_code = 0
+    try:
+        venv.create(venv_dir, with_pip=True)
+    except:
+        return_code = 1
+    return return_code
+
+
 class PostGenProtocol:
     """Protocol for post-generation hooks.
     
@@ -61,8 +78,20 @@ class PostGenProtocol:
     Stores return code for each function to record any failing hooks."""
 
     def __init__(self):
-        # TODO the logic in this step should be reconsidered
-        self.protocol: list[PostGenHook] = [PostGenHook(cleaunup_files)]
+        self.protocol: list[PostGenHook] = self._construct_protcol()
+        
+    def _construct_protcol(self) ->  list[PostGenHook]:
+        """Reconstruct sequence of PostGenHooks
+        TODO This logic might be better in a factory method/class"""
+        list_of_hooks = [
+            PostGenHook(cleaunup_files),
+        ]
+        
+        # optional steps
+        if '{% if cookiecutter.create_venv %}YES{% endif %}' == 'YES':
+            list_of_hooks.append(PostGenHook(create_venv))
+
+        return list_of_hooks
     
     def return_codes(self) -> list[int | None]:
         """Return current returncodes for all hooks in the protocol"""

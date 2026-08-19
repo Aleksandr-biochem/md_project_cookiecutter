@@ -24,9 +24,9 @@ cookiecutter gh:Aleksandr-biochem/md_project_cookiecutter
 
 ## Customise for your needs
 
-Customising for your work style and project logic is essential. Here is how you can do this in simple steps:
+Customising for your work style and project logic is essential. Here is how you can do this in a few steps:
 
-- Clone this repository locally **OR** fork it and customise.
+- Clone this repository locally **OR** fork it to customise.
 
 ```bash
 # clone the repository
@@ -35,7 +35,7 @@ git clone git@github.com:Aleksandr-biochem/md_project_cookiecutter.git
 cd md_project_cookiecutter
 ```
 
-- **Edit folder structure and files** in `{{ cookiecutter.project_name }}`
+- **Edit folders structure and files** in `{{ cookiecutter.project_name }}`. You can create any new folders and add any files that you want in your template. **Note:** it is recommended to place empty `__placeholder_file__` in empty folders so that they can be tracked with `git`. Placeholders are cleaned up by post-generation hooks.
 
 - **Reconfigure venv creation**. 
 

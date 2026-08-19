@@ -1,4 +1,5 @@
 {
   "project_name": "new_md_poroject",
-  "author": "Anonymous"
+  "author": "Anonymous",
+  "create_venv": true
 }
