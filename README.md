@@ -58,7 +58,7 @@ This is a general account of how I like to structure my computational projects, 
 
 A lot of great ideas and points to consider can be found in [The Good Research Code Handbook](https://goodresearch.dev/zipf).
 
-### 1. File structure 
+### File structure 
 
 General file structure that I found convenient through the years:
 
@@ -123,11 +123,11 @@ I also included `scripts/postprocess_trjs.sh` as an example of how you can scrip
 
 The next levelof automation would be to wrap your project in an executable workflow with tools like [Snakemake](https://snakemake.readthedocs.io/en/stable/). I actually love to do this for the analysis stage. I also have a [tutorial on starting with Snakemake](https://github.com/Aleksandr-biochem/snakemake_md_tutorial). 
 
-### Keep file descriptions in `README.md`.
+### Keep file descriptions in `README.md`
 
 README is a very helpful format to provide annotation to all the files and directories in you projects. I have a habit of revising and updating `README.md` files across my system regularly to ensure that necessary files are annotated, while unnecessary relics are deleted.
 
-### Jupyter notebook is you lab notebook. 
+### Jupyter notebook is you lab notebook
 
 I like to document my work from start to finish, as well as analyse and plot data in jupyter notebooks. Your notebook can contain details like:
 
