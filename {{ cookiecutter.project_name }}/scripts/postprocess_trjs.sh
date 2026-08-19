@@ -1,12 +1,11 @@
 #! /usr/bin/bash
 
-# This is an example bash script to postprocess trajectories
-# by centering them and excluding water
+# This is an example bash script to postprocess GROMACS trajectories by centering them and excluding water
 
 # save initial working directory
 cwd=$(pwd)
 
-declare -a groups=("group1" "group2")
+declare -a groups=("simulations")
 declare -a systems=("system1" "system2")
 
 # go though each group
@@ -21,16 +20,16 @@ do
 		do
 		
 			cd $cwd
-			cd "simulations_${group}/${system}/rep${r}/production"
+			cd "${group}/${system}/rep${r}/production"
 			
 			# check if processed trajectory exists
 			if [ ! -f "mdrun_no_water.xtc" ]; then
 
 				# convert trajectory
-				printf "SOLU\nSOLU_MEMB\n" | gmx trjconv -s mdrun.tpr -f mdrun.xtc -o mdrun_no_water.xtc -center -pbc nojump -n ../assembly_minimisation/index.ndx 
+				printf "SOLU\nSOLU_MEMB\n" | gmx trjconv -s mdrun.tpr -f mdrun.xtc -o mdrun_no_water.xtc -center -pbc mol -n ../assembly_minimisation/index.ndx 
 
 				# convert first frame
-				printf "SOLU\nSOLU_MEMB\n" | gmx trjconv -s mdrun.tpr -f mdrun.xtc -o mdrun_no_water.gro -center -pbc nojump -n ../assembly_minimisation/index.ndx -dump 0
+				printf "SOLU\nSOLU_MEMB\n" | gmx trjconv -s mdrun.tpr -f mdrun.xtc -o mdrun_no_water.gro -center -pbc mol -n ../assembly_minimisation/index.ndx -dump 0
 
 				# convert tpr
 				printf "SOLU_MEMB\n" | gmx convert-tpr -s mdrun.tpr -n ../assembly_minimisation/index.ndx -o mdrun_no_water.tpr

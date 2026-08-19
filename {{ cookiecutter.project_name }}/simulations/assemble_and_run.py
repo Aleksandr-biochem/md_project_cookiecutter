@@ -8,10 +8,11 @@ import MDAnalysis as mda
 
 #########################################################
 # This is an example script that uses COBY to set up several replicates
-# of the solvated POPC bilayer in MARTINI2
+# of the solvated POPC bilayer in Martini2 force field
 #########################################################
 
-def CreateIndex(structure, out_file, groups, group_names):
+def create_index(structure: str, out_file: str, groups: list[str], group_names: list[str]) -> None:
+	"""Create a GROMAX ndx file with groups from MDAnalysis selections"""
 
 	# read system
 	system = mda.Universe(structure)

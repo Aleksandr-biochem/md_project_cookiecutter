@@ -1,6 +1,0 @@
-lipyphilic
-matplotlib
-MDAnalysis
-numpy           <2.0.0
-pandas
-seaborn
