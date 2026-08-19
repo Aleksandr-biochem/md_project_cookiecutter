@@ -14,7 +14,7 @@ Read more [about cookiecutters](https://cookiecutter.readthedocs.io/en/stable/RE
 
 - Runs `venv` to create a new Python environment for the project with requested libraries.
 
--`git init` a new repository in the project directory.
+-  `git init` a new repository in the project directory.
 
 
 ## Use this template by fetching from GitHub
