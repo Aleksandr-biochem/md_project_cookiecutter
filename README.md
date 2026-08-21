@@ -1,6 +1,6 @@
 # Molecular Dynamics Project Cookiecutter
 
-A cookiecutter template to quick start and organise new Molecular Dynamics or generally Computational Biology projects. 
+A cookiecutter template to quick start and organise new Molecular Dynamics or generally Computational Biology projects.
 
 Read more [about cookiecutters](https://cookiecutter.readthedocs.io/en/stable/README.html).
 
@@ -23,7 +23,7 @@ Read more [about cookiecutters](https://cookiecutter.readthedocs.io/en/stable/RE
 # using pip
 pip install cookiecutter
 
-# conda 
+# conda
 conda install cookiecutter
 
 # with brew on macOS
@@ -39,7 +39,7 @@ See more options in [cookiecutter installation docs](https://cookiecutter.readth
 cookiecutter gh:Aleksandr-biochem/md_project_cookiecutter
 ```
 
-This will promt you to choose project name, sign your authorship, and whether to create new environment and init a git repository. 
+This will promt you to choose project name, sign your authorship, and whether to create new environment and init a git repository.
 
 ## Customise for your needs
 
@@ -56,7 +56,7 @@ cd md_project_cookiecutter
 
 - **Edit folder structure and files** in `{{ cookiecutter.project_name }}`. You can create any new folders and add any files that you want in your template. **Note:** it is recommended to place empty `__placeholder_file__` in any empty folders so that they can be tracked with `git`. Placeholders are cleaned up by post-generation hooks.
 
-- **Customise requirements.txt**. If `venv` step is requested, it will look for `requirements.txt` to populate the new environment. `requirements.txt` deposited with this project contains my preferred list of packages that I use in my projects. You can edit it and pin versions to your liking. 
+- **Customise requirements.txt**. If `venv` step is requested, it will look for `requirements.txt` to populate the new environment. `requirements.txt` deposited with this project contains my preferred list of packages that I use in my projects. You can edit it and pin versions to your liking.
 
 - **Advanced customisation with hooks:** a lot of steps can be run as [pre- or post-generation hooks](https://cookiecutter.readthedocs.io/en/stable/advanced/hooks.html). You can implement new hooks in `post_gen_ptoject.py` as functions with signatures `Callable[[None], int]` *(additional instructions incoming)*.
 
@@ -76,21 +76,21 @@ This is a general account of how I like to structure my computational projects, 
 
 A lot of great ideas and points to consider can be found in [The Good Research Code Handbook](https://goodresearch.dev/zipf).
 
-### File structure 
+### File structure
 
 General file structure that I found convenient through the years:
 
 ```
 project_name
-│   
+│
 ├─ README.md (for general project notes, file and dir annotation, and other info for archiving)
-│   
+│
 ├─ simulation_setup_and_analysis.ipynb (lab notebook and interactive analysis code)
-│   
+│
 └───data (input data, pdb files, datases on your molecules etc.)
 │   ├─ protein1.pdb
 │   │  ...
-│    
+│
 └───simulations (a folder with your simulations)
 │   │
 │   ├─ assemble_and_run.py (a script to assemble and run systems replicates in this group)
@@ -103,19 +103,19 @@ project_name
 |       │   ├─ equilibration
 |       │   ├─ production
 │       │   ├─ production_analysis (data extracted from this system, e.g. rmsd, lipid data etc)
-│       │   
+│       │
 │       ├───rep2
 │       │   ...
-│   
+│
 └───scripts (used for postprocessing and analysis of the simulations)
 │   ├─ postprocess_trjs.sh
 │   │  ...
-│   
+│
 └───analysis (folder for output data that you aggregated from simulation analysis)
 │   ├─ rmsd.csv
 │   ├─ ...
 │   │  ...
-│  
+│
 └───plots (plots generated in jupyter notebook)
 │   ├─ rmsd_plot.jpg
 │   │  ...
@@ -133,13 +133,13 @@ Ideally, each project should have its own environment. Especially if you are usi
 
 Scripting steps such as system setup, simulation, and postprocessingcan be exceptionally helpful. If you want to rerun simulations with other parameters, add replicates, simulate altered composition etc. you can just take the script, edit it and launch *(or add parametrers to the script allowing to configure execution)*.
 
-Also, looking back you will know for fact how the systems were generated. 
+Also, looking back you will know for fact how the systems were generated.
 
-`assemble_and_run.py` is an example for setup of several repliacates of a solvated POPC bilayer in Martini2 force field using [COBY Coarse Grained System Builder](https://github.com/MikkelDA/COBY). 
+`assemble_and_run.py` is an example for setup of several repliacates of a solvated POPC bilayer in Martini2 force field using [COBY Coarse Grained System Builder](https://github.com/MikkelDA/COBY).
 
-I also included `scripts/postprocess_trjs.sh` as an example of how you can script postprocessing of the GROMACS trajectories. 
+I also included `scripts/postprocess_trjs.sh` as an example of how you can script postprocessing of the GROMACS trajectories.
 
-The next levelof automation would be to wrap your project in an executable workflow with tools like [Snakemake](https://snakemake.readthedocs.io/en/stable/). I actually love to do this for the analysis stage. I also have a [tutorial on starting with Snakemake](https://github.com/Aleksandr-biochem/snakemake_md_tutorial). 
+The next levelof automation would be to wrap your project in an executable workflow with tools like [Snakemake](https://snakemake.readthedocs.io/en/stable/). I actually love to do this for the analysis stage. I also have a [tutorial on starting with Snakemake](https://github.com/Aleksandr-biochem/snakemake_md_tutorial).
 
 ### Keep file descriptions in `README.md`
 

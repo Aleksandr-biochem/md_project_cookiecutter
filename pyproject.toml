@@ -1,0 +1,44 @@
+[project]
+name = "md_project_cookiecutter"
+version = "0.1.0"
+description = "Cookiecutter template for a Molecular Dynamics and Computational Biology projects"
+readme = "README.md"
+requires-python = ">=3.10"
+# license = { text = "MIT" }
+authors = [
+    { name = "Aleksandr Kovalenko", email = "ikovalenko239@gmail.com" }
+]
+keywords = ["cookiecutter", "template"]
+
+dependencies = [
+    "cookiecutter>=2.6.0",
+]
+
+[project.urls]
+homepage = "https://github.com/Aleksandr-biochem/md_project_cookiecutter"
+issues = "https://github.com/Aleksandr-biochem/md_project_cookiecutter/issues"
+
+[tool.pytest.ini_options]
+testpaths = [
+    "tests",
+]
+
+[dependency-groups]
+dev = [
+    { include-group = "lint" },
+    { include-group = "test" },
+]
+lint = [
+    "ruff",
+]
+test = [
+    "pytest-randomly",
+    "pytest",
+    "pytest-cov"
+]
+
+[tool.mypy]
+# python_version = "3.10"
+strict = true
+ignore_missing_imports = true
+files = ["hooks", "tests"]
