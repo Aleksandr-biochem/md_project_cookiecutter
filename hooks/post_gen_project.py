@@ -60,12 +60,25 @@ def cleaunup_files() -> int:
 def create_venv() -> int:
     """Create new virtual environment with venv
     TODO Allow picking up requirements from requirements.txt"""
-    venv_dir = os.path.join(os.path.expanduser("~"), "venv")
+    venv_dir = os.path.join(os.getcwd(), "venv")
+    
     return_code = 0
+    print(f'Running venv create {str(venv_dir)}...')
     try:
         venv.create(venv_dir, with_pip=True)
     except:
         return_code = 1
+    
+    # resolve whether requirements.txt exists
+    if os.path.isfile('requirements.txt'):
+        print("Detected requirements.txt, running `pip install -r requirements.txt`...")
+        os.system(f"{str(venv_dir)}/bin/pip install -r requirements.txt")
+
+        print('\npip list:')
+        os.system(f"{str(venv_dir)}/bin/pip list")
+    else:
+        print('Checked for requirements.txt, none found. Leaving an empty venv.')
+
     return return_code
 
 

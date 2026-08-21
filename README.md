@@ -17,6 +17,22 @@ Read more [about cookiecutters](https://cookiecutter.readthedocs.io/en/stable/RE
 -  `git init` a new repository in the project directory.
 
 
+## Make sure you have cookicutter installed
+
+```bash
+# using pip
+pip install cookiecutter
+
+# conda 
+conda install cookiecutter
+
+# with brew on macOS
+brew install cookiecutter
+```
+
+See more options in [cookiecutter installation docs](https://cookiecutter.readthedocs.io/en/latest/installation.html)
+
+
 ## Use this template by fetching from GitHub
 
 ```bash
@@ -38,9 +54,11 @@ git clone git@github.com:Aleksandr-biochem/md_project_cookiecutter.git
 cd md_project_cookiecutter
 ```
 
-**Edit folders structure and files** in `{{ cookiecutter.project_name }}`. You can create any new folders and add any files that you want in your template. **Note:** it is recommended to place empty `__placeholder_file__` in empty folders so that they can be tracked with `git`. Placeholders are cleaned up by post-generation hooks.
+- **Edit folder structure and files** in `{{ cookiecutter.project_name }}`. You can create any new folders and add any files that you want in your template. **Note:** it is recommended to place empty `__placeholder_file__` in any empty folders so that they can be tracked with `git`. Placeholders are cleaned up by post-generation hooks.
 
-**Advanced customisation with hooks:** a lot of steps can be run as [pre- or post-generation hooks](https://cookiecutter.readthedocs.io/en/stable/advanced/hooks.html). You can implement new hooks in `post_gen_ptoject.py` as functions with signatures `Callable[[None], int]` *(additional instructions incoming)*.
+- **Customise requirements.txt**. If `venv` step is requested, it will look for `requirements.txt` to populate the new environment. `requirements.txt` deposited with this project contains my preferred list of packages that I use in my projects. You can edit it and pin versions to your liking. 
+
+- **Advanced customisation with hooks:** a lot of steps can be run as [pre- or post-generation hooks](https://cookiecutter.readthedocs.io/en/stable/advanced/hooks.html). You can implement new hooks in `post_gen_ptoject.py` as functions with signatures `Callable[[None], int]` *(additional instructions incoming)*.
 
 Run your customised cookicutter:
 
