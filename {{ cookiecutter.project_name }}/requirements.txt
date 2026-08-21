@@ -1,0 +1,7 @@
+MDAnalysis
+matplotlib
+seaborn
+pandas
+tol-colors
+numpy<=1.26.4
+jupyter
