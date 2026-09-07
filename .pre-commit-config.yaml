@@ -5,16 +5,32 @@ default_language_version:
 # See https://pre-commit.com/hooks.html for more hooks
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.6.0
+    rev: v6.0.0
     hooks:
-      - id: check-docstring-first
-      - id: check-merge-conflict
+      # safety
+      # - id: detect-private-key
+
+      # compulsory file formats
+      # - id: check-executables-have-shebangs
+      # - id: check-shebang-scripts-are-executable
+
+      # - id: check-yaml
+      - id: check-json
       - id: check-toml
+
+      # formatting conventions
       - id: end-of-file-fixer
       - id: mixed-line-ending
+      - id: trailing-whitespace
+      - id: check-docstring-first
       - id: name-tests-test
         args: [--pytest-test-first]
-      - id: trailing-whitespace
+
+      # other
+      # - id: check-merge-conflict
+      - id: no-commit-to-branch
+        args: [--branch, main]
+
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Ruff version.
     rev: v0.1.6
