@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 """Post-generation hooks to do the following:
 
-- Remove any '__placeholder_file__'
+- Remove any '__placeholder_file__' files
 - Run venv ro create a new environment
 - Run git init in the new project folder
 """
@@ -24,38 +24,12 @@ class BColors:
     ENDC = "\033[0m"
 
 
-class PostGenHook:
-    """Protocol for the post-generation hook from a Callable[[None], int]
-    TODO can be a general hook logic both for pre- and post-gen"""
-
-    def __init__(self, hook: HookFunction):
-        self.hook = hook
-        self.return_code: int | None = None
-
-    def run(self) -> None:
-        """Run the hook and record the return code. Raise if non-integer return code"""
-        return_code = self.hook()
-        if not isinstance(return_code, int):
-            raise ValueError(
-                f"Integer return code expected, got {type(return_code)} from {self.hook}"
-            )
-
-        # log hook execution
-        # TODO improve logic of handling raised exceptions and reporitng them
-        hook_name = self.hook.__name__
-        status = (
-            f"{BColors.OKGREEN}PASSED{BColors.ENDC}"
-            if return_code == 0
-            else f"{BColors.FAIL}FAILED{BColors.ENDC}"
-        )
-        print(f"{hook_name}{'.' * (50 - len(hook_name))}{status}")
-
-        self.return_code = return_code
-        return
+###### HOOK CALLABLES ######
 
 
 def cleaunup_files() -> int:
     """Cleanup any auxilliary or intermediate files from the new project.
+    In the current implementation only looks for "__placeholder_file__".
     Return int return code, 0 or 1"""
     project_dir = Path.cwd()
     for path in project_dir.rglob("__placeholder_file__"):
@@ -119,30 +93,64 @@ def git_init() -> int:
     return result.returncode
 
 
-class PostGenProtocol:
-    """Protocol for post-generation hooks.
+############################
 
-    Defined as a sequence of functions to call.
+
+class PostGenHook:
+    """Protocol for the post-generation hook from a Callable[[], int]
+    TODO can be a general hook logic both for pre- and post-gen
+
+    Attributes
+    -----------
+
+    hook: HookFunction
+        Callable that runs and returns an int exit code
+
+    return_code: int | None
+        Return code for the hook. None indicates that the hook has not been run yet."""
+
+    def __init__(self, hook: HookFunction) -> None:
+        self.hook = hook
+        self.return_code: int | None = None
+
+    def run(self) -> None:
+        """Run the hook and record the return code. Raise if non-integer return code"""
+        return_code = self.hook()
+        if not isinstance(return_code, int):
+            raise ValueError(
+                f"Integer return code expected, got {type(return_code)} from {self.hook}"
+            )
+
+        # log hook execution
+        # TODO improve logic of handling raised exceptions and reporitng them
+        hook_name = self.hook.__name__
+        status = (
+            f"{BColors.OKGREEN}PASSED{BColors.ENDC}"
+            if return_code == 0
+            else f"{BColors.FAIL}FAILED{BColors.ENDC}"
+        )
+        print(f"{hook_name}{'.' * (50 - len(hook_name))}{status}")
+
+        self.return_code = return_code
+        return
+
+
+class PostGenProtocol:
+    """Protocol for running post-generation hooks.
+
+    Defined as a sequence of PostGenHook instances to run.
     Stores return code for each function to record any failing hooks."""
 
-    def __init__(self) -> None:
-        self.protocol: list[PostGenHook] = self._construct_protcol()
-
-    def _construct_protcol(self) -> list[PostGenHook]:
-        """Reconstruct sequence of PostGenHooks
-        TODO This logic might be better in a factory method/class"""
-        list_of_hooks = [
-            PostGenHook(cleaunup_files),
-        ]
-
-        # optional steps
-        if "{% if cookiecutter.create_venv %}YES{% endif %}" == "YES":
-            list_of_hooks.append(PostGenHook(create_venv))
-
-        if "{% if cookiecutter.run_git_init %}YES{% endif %}" == "YES":
-            list_of_hooks.append(PostGenHook(git_init))
-
-        return list_of_hooks
+    def __init__(self, protocol: list[PostGenHook]) -> None:
+        if not isinstance(protocol, list):
+            raise ValueError(
+                f"`protocol` expected list[PostGenHook], got {type(protocol)}"
+            )
+        elif not all(isinstance(step, PostGenHook) for step in protocol):
+            raise ValueError(
+                f"`protocol` expected list[PostGenHook], got {[type(step) for step in protocol]}"
+            )
+        self.protocol: list[PostGenHook] = protocol
 
     def return_codes(self) -> list[int | None]:
         """Return current returncodes for all hooks in the protocol"""
@@ -151,7 +159,7 @@ class PostGenProtocol:
     def all_passed(self) -> bool:
         """Report whether all hooks passed.
         Return code None counts as not passed yet"""
-        return all([return_code == 0 for return_code in self.return_codes()])
+        return all(return_code == 0 for return_code in self.return_codes())
 
     def run(self) -> None:
         """Run hooks in self.protocol"""
@@ -163,8 +171,20 @@ class PostGenProtocol:
 def main() -> int:
     """Run the hooks and return an exit code"""
 
+    # Reconstruct sequence of PostGenHooks
+    list_of_hooks = [
+        PostGenHook(cleaunup_files),
+    ]
+
+    # optional steps
+    if "{% if cookiecutter.create_venv %}YES{% endif %}" == "YES":
+        list_of_hooks.append(PostGenHook(create_venv))
+
+    if "{% if cookiecutter.run_git_init %}YES{% endif %}" == "YES":
+        list_of_hooks.append(PostGenHook(git_init))
+
     # initiate the protocol depending on set variables
-    post_gen_hooks_protocol = PostGenProtocol()
+    post_gen_hooks_protocol = PostGenProtocol(protocol=list_of_hooks)
 
     # run the protocol and log hook execution
     print("Running post-generation hooks...")
