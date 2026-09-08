@@ -53,7 +53,9 @@ def test_post_gen_protocol_run(
     # protocol with dummy hooks
     protocol = post_gen_project.PostGenProtocol(
         [
-            post_gen_project.PostGenHook(lambda ret_code=ret_code: ret_code)
+            post_gen_project.PostGenHook(
+                cast(post_gen_project.HookFunction, lambda ret_code=ret_code: ret_code)
+            )
             for ret_code in hook_return_codes
         ]
     )
@@ -80,7 +82,9 @@ def test_post_gen_protocol_run(
 def test_post_gen_protocol_raises(invalid_hook_input: list[object]) -> None:
     """Test that PostGenProtocol raises with incorrect input"""
     with pytest.raises(ValueError, match=r"`protocol` expected list\[PostGenHook\]"):
-        post_gen_project.PostGenProtocol(invalid_hook_input)
+        post_gen_project.PostGenProtocol(
+            cast(list[post_gen_project.PostGenHook], invalid_hook_input)
+        )
 
 
 ###### TEST HOOK FUNCTIONS #####
@@ -121,7 +125,7 @@ def test_create_venv_without_requirements(
         create_calls.append((env_dir, with_pip))
 
     monkeypatch.chdir(tmp_path)
-    monkeypatch.setattr(post_gen_project.venv, "create", _fake_venv_create)
+    monkeypatch.setattr(post_gen_project.venv, "create", _fake_venv_create)  # type: ignore[attr-defined]
 
     return_code = post_gen_project.create_venv()
 
@@ -140,7 +144,7 @@ def test_create_venv_raises(
         raise OSError("venv unavailable")
 
     monkeypatch.chdir(tmp_path)
-    monkeypatch.setattr(post_gen_project.venv, "create", _failing_venv_create)
+    monkeypatch.setattr(post_gen_project.venv, "create", _failing_venv_create)  # type: ignore[attr-defined]
 
     assert post_gen_project.create_venv() == 1
 
@@ -169,8 +173,8 @@ def test_create_venv_installs_requirements_and_lists_packages(
         return subprocess.CompletedProcess(command, returncode=0)
 
     monkeypatch.chdir(tmp_path)
-    monkeypatch.setattr(post_gen_project.venv, "create", _fake_venv_create)
-    monkeypatch.setattr(post_gen_project.subprocess, "run", _fake_run)
+    monkeypatch.setattr(post_gen_project.venv, "create", _fake_venv_create)  # type: ignore[attr-defined]
+    monkeypatch.setattr(post_gen_project.subprocess, "run", _fake_run)  # type: ignore[attr-defined]
 
     return_code = post_gen_project.create_venv()
 
@@ -204,8 +208,8 @@ def test_create_venv_propagates_pip_failure(
         return subprocess.CompletedProcess(command, returncode=17)
 
     monkeypatch.chdir(tmp_path)
-    monkeypatch.setattr(post_gen_project.venv, "create", _fake_venv_create)
-    monkeypatch.setattr(post_gen_project.subprocess, "run", _fake_run)
+    monkeypatch.setattr(post_gen_project.venv, "create", _fake_venv_create)  # type: ignore[attr-defined]
+    monkeypatch.setattr(post_gen_project.subprocess, "run", _fake_run)  # type: ignore[attr-defined]
 
     return_code = post_gen_project.create_venv()
 
@@ -227,6 +231,6 @@ def test_git_init_returns_subprocess_code(monkeypatch: pytest.MonkeyPatch) -> No
         assert check is False
         return subprocess.CompletedProcess(command, returncode=3)
 
-    monkeypatch.setattr(post_gen_project.subprocess, "run", _fake_run)
+    monkeypatch.setattr(post_gen_project.subprocess, "run", _fake_run)  # type: ignore[attr-defined]
 
     assert post_gen_project.git_init() == 3

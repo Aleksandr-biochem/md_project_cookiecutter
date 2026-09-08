@@ -177,10 +177,10 @@ def main() -> int:
     ]
 
     # optional steps
-    if "{% if cookiecutter.create_venv %}YES{% endif %}" == "YES":
+    if "{% if cookiecutter.create_venv %}YES{% endif %}" == "YES":  # type: ignore
         list_of_hooks.append(PostGenHook(create_venv))
 
-    if "{% if cookiecutter.run_git_init %}YES{% endif %}" == "YES":
+    if "{% if cookiecutter.run_git_init %}YES{% endif %}" == "YES":  # type: ignore
         list_of_hooks.append(PostGenHook(git_init))
 
     # initiate the protocol depending on set variables
