@@ -20,7 +20,7 @@ def bake_project(
     project_name: str,
     run_git_init: bool = False,
 ) -> Path:
-    """Bake a project with slow virtual-environment creation disabled."""
+    """Bake a project with slow virtual environment creation disabled."""
     output_dir = tmp_path / "baked"
     output_dir.mkdir()
 
@@ -35,11 +35,12 @@ def bake_project(
             "run_git_init": run_git_init,
         },
     )
+
     return Path(generated_path)
 
 
 def test_bake_project(tmp_path: Path) -> None:
-    """Bake the template and verify its core file/directory structure."""
+    """Test baking a template and verify its core file/directory structure."""
     project_path = bake_project(tmp_path, project_name="example_md_project")
 
     assert project_path.name == "example_md_project"
@@ -61,6 +62,7 @@ def test_bake_project(tmp_path: Path) -> None:
     assert all(path.is_file() for path in expected_files)
 
     assert not list(project_path.rglob("__placeholder_file__"))
+    # both venv and git init were disabled
     assert not (project_path / "venv").exists()
     assert not (project_path / ".git").exists()
 

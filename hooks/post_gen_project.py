@@ -27,7 +27,7 @@ class BColors:
 ###### HOOK CALLABLES ######
 
 
-def cleaunup_files() -> int:
+def cleanup_files() -> int:
     """Cleanup any auxilliary or intermediate files from the new project.
     In the current implementation only looks for "__placeholder_file__".
     Return int return code, 0 or 1"""
@@ -173,7 +173,7 @@ def main() -> int:
 
     # Reconstruct sequence of PostGenHooks
     list_of_hooks = [
-        PostGenHook(cleaunup_files),
+        PostGenHook(cleanup_files),
     ]
 
     # optional steps
