@@ -41,6 +41,7 @@ jobs:
           pre-commit run --all-files
 
   # Run type checks
+  # NOTE pytest installation needed so that mypy does not complain about untyped decorators
   type-check:
     name: mypy
     needs: check
@@ -59,7 +60,7 @@ jobs:
       - name: Install mypy
         run: |
           python -m pip install --upgrade pip
-           python -m pip install mypy
+          python -m pip install mypy pytest
 
       - name: Run mypy
         run: |
