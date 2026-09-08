@@ -68,7 +68,7 @@ jobs:
 
   # Test job: depends on check, runs pytest in a matrix of OS × Python
   pytest:
-    needs: mypy
+    needs: type-check
     name: pytest (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
     strategy:
