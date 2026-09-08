@@ -22,7 +22,8 @@ lint = [
 test = [
     "pytest-randomly",
     "pytest",
-    "pytest-cov"
+    "pytest-cov",
+    "coverage-badge"
 ]
 dev = [
     "md_project_cookiecutter[lint]",
