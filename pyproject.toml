@@ -12,6 +12,7 @@ keywords = ["cookiecutter", "template", "computational biology", "molecular simu
 
 dependencies = [
     "cookiecutter>=2.6.0",
+    "questionary>=2.0"
 ]
 
 [project.optional-dependencies]

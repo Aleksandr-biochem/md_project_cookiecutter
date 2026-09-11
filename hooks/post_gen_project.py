@@ -5,8 +5,9 @@
 - Run venv ro create a new environment
 - Run git init in the new project folder
 """
-
+import json
 import venv
+import shutil
 import subprocess
 from pathlib import Path
 
@@ -40,6 +41,54 @@ def cleanup_files() -> int:
         path.is_file() for path in project_dir.rglob("__placeholder_file__")
     )
     return 1 if placeholders_left else 0
+
+
+def resolve_file_selections() -> int:
+    """Resolve force field and mdp template selections"""
+    try:
+        file_selections: list[tuple[list[str], list[str], str, str]] = [
+            (
+                json.loads({{cookiecutter._all_force_fields_dirs | jsonify}}),  # type: ignore # noqa
+                json.loads({{cookiecutter._selected_force_fields_dirs | jsonify}}),  # type: ignore # noqa
+                "force_fields",
+                "toppar.ff",
+            ),
+            (
+                json.loads({{cookiecutter._all_mdp_templates_dirs | jsonify}}),  # type: ignore # noqa
+                json.loads({{cookiecutter._selected_mdp_templates_dirs | jsonify}}),  # type: ignore # noqa
+                "mdp_templates",
+                "template",
+            ),
+        ]
+
+        for all_dirs, selected_dirs, group_name, single_dir_name in file_selections:
+            # This clause is executed if we run template without the selection wrapper
+            if not all_dirs or not selected_dirs:
+                print(
+                    f"All {group_name} options are copied under 'simulations/{group_name}'"
+                )
+                return 0
+
+            template_source = Path.cwd() / "simulations" / group_name
+
+            # move up all neccessary filders
+            for dir_name in selected_dirs:
+                path = template_source / dir_name
+                final_name = single_dir_name if len(selected_dirs) == 1 else dir_name
+                path.rename(Path.cwd() / "simulations" / final_name)
+
+            # unlink "directory diwh unwated selections
+            shutil.rmtree(template_source)
+
+        return 0
+
+    except KeyboardInterrupt:
+        print("\nCalcelled at the file selection step.")
+        return 130
+
+    except Exception as exc:
+        print(f"ERROR: {exc}")
+        return 1
 
 
 def create_venv() -> int:
@@ -172,9 +221,7 @@ def main() -> int:
     """Run the hooks and return an exit code"""
 
     # Reconstruct sequence of PostGenHooks
-    list_of_hooks = [
-        PostGenHook(cleanup_files),
-    ]
+    list_of_hooks = [PostGenHook(cleanup_files), PostGenHook(resolve_file_selections)]
 
     # optional steps
     if "{% if cookiecutter.create_venv %}YES{% endif %}" == "YES":  # type: ignore
