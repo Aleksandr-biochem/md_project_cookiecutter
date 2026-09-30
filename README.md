@@ -1,6 +1,6 @@
 # Molecular Dynamics Project Cookiecutter
 
-A cookiecutter template to quick start and organise new Molecular Dynamics or generally Computational Biology projects.
+A cookiecutter template to quick start and organise new Molecular Dynamics or Computational Biology projects.
 
 Read more [about cookiecutters](https://cookiecutter.readthedocs.io/en/stable/README.html).
 
@@ -14,12 +14,14 @@ Read more [about cookiecutters](https://cookiecutter.readthedocs.io/en/stable/RE
 
 - Creates a directory structure (e.g. `data`, `plots`, `scripts`, `simulations` etc.)
 
+- Facilitates selections between template files (e.g. force fields and mdp bundles)
+
 - Runs `venv` to create a new Python environment for the project with requested libraries.
 
--  `git init` a new repository in the project directory.
+- `git init` a new repository in the project directory.
 
 
-## Make sure you have cookicutter installed
+## Make sure you have cookiecutter installed
 
 ```bash
 # using pip
@@ -34,37 +36,59 @@ brew install cookiecutter
 
 See more options in [cookiecutter installation docs](https://cookiecutter.readthedocs.io/en/latest/installation.html)
 
-
-## Use this template by fetching from GitHub
+## Quick start usage by fetching from GitHub
 
 ```bash
 cookiecutter gh:Aleksandr-biochem/md_project_cookiecutter
 ```
 
-This will promt you to choose project name, sign your authorship, and whether to create new environment and init a git repository.
+This will promt you to choose project name, sign your authorship, and whether to create a new environment and init a git repository.
 
-## Customise for your needs
+**NOTE:** this usage mode does not include interactive template selection from `simulations/force_fields` and `simulations/mdp_templates`. All files from these folders will be copied in the baked project. To unlock the full flexibility of this template, follow the steps in the next sections.
 
-Customising for your work style and project logic is essential. Here is how you can do this in a few steps:
+## Interactive template files selection
 
-- Clone this repository locally **OR** fork it to customise.
+You can interactively select templates from `simulations/force_fields` and  `simulations/mdp_templates`. **However**, this functionality is not supported through `cookiecutter` call alone. It is implemented in a `bake_md_project.py` wrapper that uses [`questionary`](https://pypi.org/project/questionary/).
+
+To use this functionality, clone the project locally and install `questionary`:
 
 ```bash
-# clone the repository
+pip install cookiecutter questionary
+
+git clone git@github.com:Aleksandr-biochem/md_project_cookiecutter.git
+
+# run the wrapper with interactive selections
+python path/to/md_project_cookiecutter/bake_md_project.py
+```
+
+## Customisation
+
+Customising for your work style and project logic, as well as adding your files is essential. Here is how you can do this in a few steps:
+
+- Clone this repository locally **OR** fork it to customise (recommended).
+
+```bash
+# clone this repository or your fork
 git clone git@github.com:Aleksandr-biochem/md_project_cookiecutter.git
 
 cd md_project_cookiecutter
 ```
 
-- **Edit folder structure and files** in `{{ cookiecutter.project_name }}`. You can create any new folders and add any files that you want in your template. **Note:** it is recommended to place empty `__placeholder_file__` in any empty folders so that they can be tracked with `git`. Placeholders are cleaned up by post-generation hooks.
+- **Edit folder structure and files** in `{{ cookiecutter.project_name }}`. You can create any new folders and add/remove any files that you want in your template. **Note:** it is recommended to place empty `__placeholder_file__` in any empty folders so that they can be tracked with `git`. Placeholders are cleaned up by post-generation hooks.
+
+- **Add force fields and mdp templates**. You can add/remove force fields and mdp bundles in `simulations/force_fields` and  `simulations/mdp_templates`. They will be automatically picked up by the `bake_md_project.py` wrapper (see the previous section). Adding additional groups for selections on top of `force_fields` and `mdp_templates` requires modification of the `bake_md_project.py`
 
 - **Customise requirements.txt**. If `venv` step is requested, it will look for `requirements.txt` to populate the new environment. `requirements.txt` deposited with this project contains my preferred list of packages that I use in my projects. You can edit it and pin versions to your liking.
 
 - **Advanced customisation with hooks:** a lot of steps can be run as [pre- or post-generation hooks](https://cookiecutter.readthedocs.io/en/stable/advanced/hooks.html). You can implement new hooks in `post_gen_ptoject.py` as functions with signatures `Callable[[None], int]` *(additional instructions incoming)*.
 
-Run your customised cookicutter:
+Run your customised cookiecutter:
 
 ```
+# USE THE WRAPPER FOR INTERACTIVE SELECTIONS
+python path/to/md_project_cookiecutter/bake_md_project.py
+
+# WITHOUT THE INTERACTIVE SELECTION WRAPPER
 # from local clone
 cookiecutter local/path/to/md_project_cookiecutter
 

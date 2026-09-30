@@ -2,18 +2,21 @@
 """Post-generation hooks to do the following:
 
 - Remove any '__placeholder_file__' files
+- Resolve selected template files (force fields and mdp files)
 - Run venv ro create a new environment
 - Run git init in the new project folder
 """
-
+import json
 import venv
+import shutil
 import subprocess
 from pathlib import Path
-
+from typing import Literal, cast
 from collections.abc import Callable
 
 
 HookFunction = Callable[[], int]
+JinjaBool = Literal["YES", ""]
 
 
 class BColors:
@@ -40,6 +43,68 @@ def cleanup_files() -> int:
         path.is_file() for path in project_dir.rglob("__placeholder_file__")
     )
     return 1 if placeholders_left else 0
+
+
+def _get_file_selections() -> list[tuple[list[str], list[str], str, str]]:
+    """Get file selections to use in template file preparation by resolve_file_selections.
+    This is to keep maximum separation of Jinja and Python logic."""
+    return [
+        (
+            json.loads({{cookiecutter._all_force_fields_dirs | jsonify}}),  # type: ignore # noqa
+            json.loads({{cookiecutter._selected_force_fields_dirs | jsonify}}),  # type: ignore # noqa
+            "force_fields",
+            "toppar.ff",
+        ),
+        (
+            json.loads({{cookiecutter._all_mdp_templates_dirs | jsonify}}),  # type: ignore # noqa
+            json.loads({{cookiecutter._selected_mdp_templates_dirs | jsonify}}),  # type: ignore # noqa
+            "mdp_templates",
+            "template",
+        ),
+    ]
+
+
+def resolve_file_selections() -> int:
+    """Resolve force field and mdp template selections"""
+    try:
+        file_selections: list[
+            tuple[list[str], list[str], str, str]
+        ] = _get_file_selections()
+
+        for all_dirs, selected_dirs, group_name, single_dir_name in file_selections:
+            # This clause is executed if we run cookiecutter without the bake_md_project.py wrapper
+            if not all_dirs or not selected_dirs:
+                print(
+                    f"All {group_name} options are copied under 'simulations/{group_name}'"
+                )
+                return 0
+
+            template_source = Path.cwd() / "simulations" / group_name
+
+            # one template selected; move selected folder
+            if len(selected_dirs) == 1:
+                selected_dir = template_source / selected_dirs[0]
+                selected_dir.rename(Path.cwd() / "simulations" / single_dir_name)
+
+                # unlink  unwated selections
+                shutil.rmtree(template_source)
+
+            # multiple templates selected; unlink unwanted folders
+            else:
+                for dir_name in all_dirs:
+                    if dir_name not in selected_dirs:
+                        # unlink unwated selections
+                        shutil.rmtree(template_source / dir_name)
+
+        return 0
+
+    except KeyboardInterrupt:
+        print("\nCalcelled at the file selection step.")
+        return 130
+
+    except Exception as exc:
+        print(f"ERROR: {exc}")
+        return 1
 
 
 def create_venv() -> int:
@@ -168,19 +233,29 @@ class PostGenProtocol:
         return
 
 
+def _get_create_venv() -> JinjaBool:
+    """Return cookiecutter.create_venv value substituted by Jinja.
+    This is to keep Jinja logic separate from python"""
+    return cast(JinjaBool, "{% if cookiecutter.create_venv %}YES{% endif %}")
+
+
+def _get_run_git_init() -> JinjaBool:
+    """Return cookiecutter.run_git_init value substituted by Jinja.
+    This is to keep Jinja logic separate from python"""
+    return cast(JinjaBool, "{% if cookiecutter.run_git_init %}YES{% endif %}")
+
+
 def main() -> int:
     """Run the hooks and return an exit code"""
 
     # Reconstruct sequence of PostGenHooks
-    list_of_hooks = [
-        PostGenHook(cleanup_files),
-    ]
+    list_of_hooks = [PostGenHook(cleanup_files), PostGenHook(resolve_file_selections)]
 
     # optional steps
-    if "{% if cookiecutter.create_venv %}YES{% endif %}" == "YES":  # type: ignore
+    if _get_create_venv() == "YES":
         list_of_hooks.append(PostGenHook(create_venv))
 
-    if "{% if cookiecutter.run_git_init %}YES{% endif %}" == "YES":  # type: ignore
+    if _get_run_git_init() == "YES":
         list_of_hooks.append(PostGenHook(git_init))
 
     # initiate the protocol depending on set variables

@@ -234,3 +234,140 @@ def test_git_init_returns_subprocess_code(monkeypatch: pytest.MonkeyPatch) -> No
     monkeypatch.setattr(post_gen_project.subprocess, "run", _fake_run)  # type: ignore[attr-defined]
 
     assert post_gen_project.git_init() == 3
+
+
+@pytest.mark.parametrize(
+    "selected_force_fields_dirs, selected_mdp_templates_dirs, expected_folders, unexpected_folders",
+    [
+        ([], [], ["force_fields", "mdp_templates"], []),
+        (
+            ["amber"],
+            ["cg"],
+            ["toppar.ff", "template"],
+            ["force_fields", "mdp_templates"],
+        ),
+        (
+            ["amber", "charmm"],
+            ["cg"],
+            ["force_fields", "template"],
+            ["toppar.ff", "mdp_templates"],
+        ),
+        (
+            ["amber"],
+            ["cg", "aa"],
+            ["toppar.ff", "mdp_templates"],
+            ["force_fields", "template"],
+        ),
+        (
+            ["amber", "martini"],
+            ["custom", "aa"],
+            ["force_fields", "mdp_templates"],
+            ["toppar.ff", "template"],
+        ),
+    ],
+)
+def test_resolve_file_selections(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    selected_force_fields_dirs: list[str],
+    selected_mdp_templates_dirs: list[str],
+    expected_folders: list[str],
+    unexpected_folders: list[str],
+) -> None:
+    """Test that resolve_file_selections hook picks up file selection from cookiecutter variables,
+    moves requested files and unlinks unbwated files."""
+    # setup the dummy directories
+    simulations = tmp_path / "simulations"
+    template_names = {
+        "force_fields": ["amber", "charmm", "martini"],
+        "mdp_templates": ["cg", "aa", "custom"],
+    }
+    for template_group in ["force_fields", "mdp_templates"]:
+        group_dir = simulations / template_group
+        group_dir.mkdir(parents=True)
+        for template in template_names[template_group]:
+            (group_dir / template).mkdir()
+
+    # patch _get_file_selections return
+    def _fake_get_file_selections() -> list[tuple[list[str], list[str], str, str]]:
+        """Return patched Cookiecutter selections"""
+        return [
+            (
+                template_names["force_fields"],
+                selected_force_fields_dirs,
+                "force_fields",
+                "toppar.ff",
+            ),
+            (
+                template_names["mdp_templates"],
+                selected_mdp_templates_dirs,
+                "mdp_templates",
+                "template",
+            ),
+        ]
+
+    monkeypatch.chdir(tmp_path)
+    monkeypatch.setattr(
+        post_gen_project, "_get_file_selections", _fake_get_file_selections
+    )
+
+    # run hook and check return code
+    assert post_gen_project.resolve_file_selections() == 0
+
+    # check correct outputs
+    for expected_folder in expected_folders:
+        assert (simulations / expected_folder).is_dir()
+    for unexpected_folder in unexpected_folders:
+        assert not (simulations / unexpected_folder).exists()
+
+
+@pytest.mark.parametrize(
+    "all_passed, expected_return_code, expected_message",
+    [
+        (True, 0, "Your new project has been created successfully!"),
+        (
+            False,
+            1,
+            "You new project has been generated but the post-generation hooks did not complete.",
+        ),
+    ],
+)
+def test_main(
+    monkeypatch: pytest.MonkeyPatch,
+    capsys: pytest.CaptureFixture[str],
+    all_passed: bool,
+    expected_return_code: int,
+    expected_message: str,
+) -> None:
+    """Smoke test for main; runs the post-generation protocol and reports its overall status.
+    A more complete testing is performed in test_bake_project."""
+
+    class _FakePostGenProtocol:
+        """Minimal PostGenProtocol replacement for testing main."""
+
+        def __init__(
+            self,
+            protocol: list[post_gen_project.PostGenHook],
+        ) -> None:
+            self.protocol = protocol
+            self.was_run = False
+
+        def run(self) -> None:
+            self.was_run = True
+
+        def all_passed(self) -> bool:
+            assert self.was_run is True
+            return all_passed
+
+    monkeypatch.setattr(
+        post_gen_project,
+        "PostGenProtocol",
+        _FakePostGenProtocol,
+    )
+
+    return_code = post_gen_project.main()
+
+    output = capsys.readouterr().out
+    assert return_code == expected_return_code
+    assert "Running post-generation hooks..." in output
+    assert expected_message in output

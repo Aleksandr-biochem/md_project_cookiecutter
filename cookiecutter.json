@@ -2,5 +2,11 @@
   "project_name": "new_md_poroject",
   "author": "Anonymous",
   "create_venv": true,
-  "run_git_init": true
+  "run_git_init": true,
+
+  "_all_force_fields_dirs": "[]",
+  "_selected_force_fields_dirs": "[]",
+
+  "_all_mdp_templates_dirs": "[]",
+  "_selected_mdp_templates_dirs": "[]"
 }
