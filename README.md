@@ -8,7 +8,7 @@ Read more [about cookiecutters](https://cookiecutter.readthedocs.io/en/stable/RE
 
 [![CI pipeline](https://github.com/Aleksandr-biochem/md_project_cookiecutter/actions/workflows/tests.yml/badge.svg?branch=main)](https://github.com/Aleksandr-biochem/md_project_cookiecutter/actions/workflows/tests.yml) [![codecov](https://codecov.io/gh/Aleksandr-biochem/md_project_cookiecutter/graph/badge.svg?token=8SVL1ANKRF)](https://codecov.io/gh/Aleksandr-biochem/md_project_cookiecutter)
 
-**GenAI use disclosure:** ChatGPT-5.6 Sol (Edu Licence, OpenAI, https://chatgpt.com/) was used in this project to: (i) draft test suites, (ii) draft CI pipeline files, (iii) provide advise and review for feature implementation in the project code. All outputs were verified by a human.   
+**GenAI use disclosure:** ChatGPT-5.6 Sol (Edu Licence, OpenAI, https://chatgpt.com/) was used in this project to: (i) draft test suites, (ii) draft CI pipeline files, (iii) provide advise and review for feature implementation in the project code. All outputs were verified by a human.
 
 -------------
 
