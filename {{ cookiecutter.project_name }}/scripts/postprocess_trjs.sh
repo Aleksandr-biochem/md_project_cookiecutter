@@ -24,7 +24,10 @@ do
 			cd "${group}/${system}/rep${r}/production"
 			
 			# check if processed trajectory exists
-			if [ ! -f "prodction_no_water.xtc" ]; then
+			if [ ! -f "production_no_water.xtc" ]; then
+
+				# create a readable tpr for a different version of GROMACS
+				# gmx grompp -f production.mdp -c ../equilibration/step6.6_equilibration.gro -p ../assembly/topol.top -n ../assembly/index.ndx -o production_readable.tpr
 
 				# convert trajectory
 				printf "SOLU\nSOLU_MEMB\n" | gmx trjconv -s production.tpr -f production.xtc -o production_no_water.xtc -center -pbc mol -n ../assembly/index.ndx 
